@@ -1,0 +1,49 @@
+init python:
+    class Episode():
+        PREFIX = "ep"
+        BEGINNING = "beginning"
+        ENDING = "ending"
+
+        @property
+        def number(self):
+            try:
+                return self.__class__.all().index(self) + 1
+            except:
+                return 0
+
+        @property
+        def id(self):
+            return "{}{}".format(self.__class__.PREFIX, self.number)
+
+        @property
+        def beginning(self):
+            l = "{}_{}".format(self.id, self.__class__.BEGINNING)
+            return l if renpy.has_label(l) else ""
+
+        @property
+        def ending(self):
+            l = "{}_{}".format(self.id, self.__class__.ENDING)
+            return l if renpy.has_label(l) else ""
+
+        @property
+        def played(self):
+            return renpy.seen_label(self.beginning) and \
+                renpy.seen_label(self.ending)
+
+        def __init__(self, title, description=""):
+            self.__class__.all().append(self)
+
+            self.title = title
+            self.description = description
+
+        def play(self):
+            if self.beginning: renpy.run(Start(self.beginning))
+
+        def Play(self):
+            return Function(self.play)
+
+        @classmethod
+        def all(cls):
+            return store._episodes
+
+define _episodes = []

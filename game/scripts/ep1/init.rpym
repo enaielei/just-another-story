@@ -1,0 +1,2 @@
+init python:
+    renpy.load_module("scripts/ep1/labels")
