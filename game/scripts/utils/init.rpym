@@ -1,2 +1,4 @@
 init python:
-    renpy.load_module("scripts/utils/episode")
+    load_module(
+        "scripts/utils/episode"
+    )
