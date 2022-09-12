@@ -1,7 +1,3 @@
-label main_menu:
-    call screen main_menu
-    return
-
 screen main_menu():
     tag menu
     
@@ -14,28 +10,6 @@ screen main_menu():
 
         textbutton "Quit":
             action Quit()
-
-init python:
-    Hint.initialize()
-
-screen hint(hint=None, **kwargs):
-    $ hint = Hint.get(hint)
-
-    layer "hint"
-
-    if hint and not hint.empty and hint.active:
-        vbox:
-            xoffset 20
-            yoffset 20
-            properties hint.kwargs
-
-            if hint.text:
-                text hint.text
-
-            if hint.displayable:
-                add hint.displayable
-
-            at tracker
 
 screen say(who, what, *args, **kwargs):
     python:
@@ -67,3 +41,22 @@ screen say(who, what, *args, **kwargs):
                 id "what"
                 xalign 0.5
                 xsize 1.0
+
+screen hint(hint=None, **kwargs):
+    $ hint = Hint.get(hint)
+
+    layer "hint"
+
+    if hint and not hint.empty and hint.active:
+        vbox:
+            xoffset 20
+            yoffset 20
+            properties hint.kwargs
+
+            if hint.text:
+                text hint.text
+
+            if hint.displayable:
+                add hint.displayable
+
+            at tracker

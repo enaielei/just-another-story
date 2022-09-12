@@ -6,5 +6,8 @@ init python:
         
         "scripts/core/character-profile",
         "scripts/core/styles",
-        "scripts/core/screens"
+        "scripts/core/screens",
+        "scripts/core/labels",
     )
+
+    Hint.initialize()

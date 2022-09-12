@@ -1,0 +1,3 @@
+label main_menu:
+    call screen main_menu
+    return
