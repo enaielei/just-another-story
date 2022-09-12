@@ -1,5 +1,5 @@
 init python:
-    def _follow_cursor(tr, st, at):
+    def _tracker(tr, st, at):
         ssize = (config.screen_width, config.screen_height)
         csize = tr.child_size
         mpos = renpy.get_mouse_pos()
@@ -26,8 +26,11 @@ init python:
             pos[1] = int(pos[1] - (bottom - ssize[1]))
 
         tr.pos = pos
-        
+
         return 0
 
-transform follow_cursor:
-    function _follow_cursor
+    def Tracker(child=None, *args, **kwargs):
+        return Transform(child, _tracker, *args, **kwargs)
+
+transform tracker:
+    function _tracker

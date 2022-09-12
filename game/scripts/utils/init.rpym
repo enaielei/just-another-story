@@ -1,6 +1,6 @@
 init python:
     load_module(
-        "scripts/utils/follow_cursor",
+        "scripts/utils/tracker",
         "scripts/utils/hint",
         "scripts/utils/episode"
     )
