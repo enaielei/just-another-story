@@ -1,0 +1,74 @@
+init python:
+    class Hint():
+        LAYER = "hint"
+        SCREEN = "hint"
+        
+        current = None
+
+        @property
+        def empty(self):
+            return not self.text and not self.displayable
+
+        def __init__(self, screen, text="", displayable=None, *args, **kwargs):
+            self.screen = screen
+            self.text = text
+            self.displayable = displayable
+            self.args = args
+            self.kwargs = kwargs
+
+        @classmethod
+        def set(cls, *args, **kwargs):
+            cls.current = cls.new(*args, **kwargs)
+
+        @classmethod
+        def get(cls, default=None, update=False):
+            if update: cls.update()
+            return cls.current or default
+
+        @classmethod
+        def clear(cls):
+            cls.current = None
+
+        @classmethod
+        def update(cls):
+            screen = renpy.current_screen()
+            if cls.current and screen:
+                if cls.current.screen != screen.name:
+                    cls.clear()
+
+        @classmethod
+        def initialize(cls, layer=None, screen=None):
+            name = cls.__name__.lower()
+            
+            if not isinstance(layer, (list, tuple, set)): layer = [None]
+            for l in layer:
+                renpy.add_layer(l or name, above="overlay", menu_clear=False)
+
+            if not isinstance(screen, (list, tuple, set)): screen = [None]
+            for s in screen:
+                s = s or name
+                if s not in config.always_shown_screens:
+                    config.always_shown_screens.append(s)
+
+            if config.context_callback is not None:
+                fn = lambda: config.context_callback() and cls.clear()
+            else: fn = cls.clear
+
+            config.context_callback = fn
+
+        @classmethod
+        def new(cls, *args, **kwargs):
+            screen = renpy.current_screen()
+            return cls(screen.name, *args, **kwargs)
+
+        @classmethod
+        def Set(cls, *args, **kwargs):
+            return Function(cls.set, *args, *kwargs)
+
+        @classmethod
+        def Update(cls):
+            return Function(cls.update)
+
+        @classmethod
+        def Clear(cls):
+            return Function(cls.clear)
