@@ -21,8 +21,8 @@ init python:
             self.kwargs = kwargs
 
         @classmethod
-        def set(cls, *args, **kwargs):
-            cls.current = cls.new(*args, **kwargs)
+        def set(cls, text="", displayable=None, *args, **kwargs):
+            cls.current = cls.new(text, displayable, *args, **kwargs)
 
         @classmethod
         def get(cls, default=None, update=False):
@@ -61,13 +61,13 @@ init python:
             config.context_callback = fn
 
         @classmethod
-        def new(cls, *args, **kwargs):
+        def new(cls, text="", displayable=None, *args, **kwargs):
             screen = renpy.current_screen()
-            return cls(screen.name, *args, **kwargs)
+            return cls(screen.name, text, displayable, *args, **kwargs)
 
         @classmethod
-        def Set(cls, *args, **kwargs):
-            return Function(cls.set, *args, *kwargs)
+        def Set(cls, text="", displayable=None, *args, **kwargs):
+            return Function(cls.set, text, displayable, *args, **kwargs)
 
         @classmethod
         def Update(cls):
