@@ -4,10 +4,12 @@ init python:
         BEGINNING = "beginning"
         ENDING = "ending"
 
+        all = []
+
         @property
         def number(self):
             try:
-                return self.__class__.all().index(self) + 1
+                return self.__class__.all.index(self) + 1
             except:
                 return 0
 
@@ -31,7 +33,7 @@ init python:
                 renpy.seen_label(self.ending)
 
         def __init__(self, title, description=""):
-            self.__class__.all().append(self)
+            self.__class__.all.append(self)
 
             self.title = title
             self.description = description
@@ -41,9 +43,3 @@ init python:
 
         def Play(self):
             return Function(self.play)
-
-        @classmethod
-        def all(cls):
-            return store._episodes
-
-define _episodes = []
