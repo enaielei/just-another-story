@@ -22,5 +22,5 @@ init python hide:
     load_module(*("scripts/{}".format(module) for module in _modules))
 
 label start:
-    "Hello World!!!"
+    $ Episode.all[0].play()
     return

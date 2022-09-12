@@ -1,5 +1,42 @@
 label ep1_beginning:
     pass
 
+label ep1_scene1:
+    # mc and daughter sleeping together
+    mc "A lot happened recently." (kwargs=dict(abc=123))
+    "A lot happened recently."
+
+label ep1_scene2:
+    # mc taking a bath
+    pass
+
+label ep1_scene3:
+    # mc breakfast
+    pass
+
+label ep1_scene4:
+    # mc college talking to the dean as well as the faculty
+    pass
+
+label ep1_scene5:
+    # mc driving home talking with daughter uniform and stuff
+    pass
+
+label ep1_scene6:
+    # mc pizza dinner
+    pass
+
+label ep1_scene7:
+    # mc drinking night
+    pass
+
+label ep1_scene8a:
+    # mc fucking a young chick
+    pass
+
+label ep1_scene8b:
+    # mc ending up in bed early
+    pass
+
 label ep1_ending:
     pass

@@ -1,0 +1,12 @@
+style default
+
+style window is default
+
+style text is default
+
+style button is window:
+    background "#fff3"
+    hover_background "#fff5"
+
+style button_text is text:
+    hover_color "#0f0"

@@ -1,0 +1,2 @@
+define character.mc = Character("Michael Jester Reeves")
+define character.amr = Character("Anastasia Moonfort Reeves")
