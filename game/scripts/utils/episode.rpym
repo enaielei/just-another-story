@@ -32,11 +32,12 @@ init python:
             return renpy.seen_label(self.beginning) and \
                 renpy.seen_label(self.ending)
 
-        def __init__(self, title, description=""):
+        def __init__(self, title, description="", displayable=None):
             self.__class__.all.append(self)
 
             self.title = title
             self.description = description
+            self.displayable = displayable
 
         def play(self):
             if self.beginning: renpy.run(Start(self.beginning))
