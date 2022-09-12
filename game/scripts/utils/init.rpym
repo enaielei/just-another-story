@@ -1,6 +1,9 @@
-init python:
-    load_module(
+init python hide:
+    modules = (
         "scripts/utils/tracker",
         "scripts/utils/hint",
         "scripts/utils/episode"
     )
+    
+    for mod in modules:
+        renpy.load_module(mod)
