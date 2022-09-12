@@ -9,6 +9,10 @@ init python:
         def empty(self):
             return not self.text and not self.displayable
 
+        @property
+        def active(self):
+            return bool(renpy.get_screen(self.screen))
+
         def __init__(self, screen, text="", displayable=None, *args, **kwargs):
             self.screen = screen
             self.text = text
