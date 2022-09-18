@@ -1,0 +1,124 @@
+init python:
+    class RecordMeta(type):
+        def __new__(self, name, bases, attrs):
+            return type.__new__(self, name, bases, attrs)
+
+        @property
+        def _has_many(cls):
+            name = "__has_many".format(cls.__name__.lower())
+            return helper.ensureattr(store, name, {})
+
+        @property
+        def _all(cls):
+            name = "_{}_all".format(cls.__name__.lower())
+            return helper.ensureattr(store, name, [])
+
+        @property
+        def all(cls): return tuple(cls._all)
+
+    class Record(metaclass=RecordMeta):
+        @property
+        def id(self):
+            return self._id
+
+        @property
+        def created(self):
+            e = helper.find(lambda e: e.id == self.id, self.__class__._all)
+            return e is not None
+
+        def __init__(self):
+            self._id = -1
+
+        def create(self, *args, **kwargs):
+            if self.created: return self
+
+            cls = self.__class__
+            m = max(cls._all, default=None, key=lambda e: e.id)
+            id = 0 if not m else m.id + 1
+            cls._all.append(self)
+            self._id = id
+            return self
+
+        def update(self, **kwargs):
+            vars(self).update(kwargs)
+            return self
+
+        def delete(self):
+            cls = self.__class__
+            i = helper.index(lambda e: e.id == self.id, cls._all)
+            if i != -1:
+                e = cls._all[i]
+                e._id = -1
+                cls._all.pop(i)
+
+                for c, n in e.__class__._has_many.items():
+                    c.clear(lambda i: getattr(i, n) == e)
+
+            return self
+
+        @classmethod
+        def clear(cls, condition=None):
+            if not callable(condition): condition = lambda e: True
+            for e in cls.all:
+                if condition(e): e.delete()
+
+        @classmethod
+        def get(cls, condition=None):
+            if not callable(condition): condition = lambda e: True
+            return helper.find(condition, cls._all)
+
+        @classmethod
+        def get_all(cls, condition=None):
+            if not callable(condition): condition = lambda e: True
+            return tuple(filter(condition, cls._all))
+
+        @classmethod
+        def has_one(cls, other, one_name=None, many_name=None):
+            return cls._has_one(other, one_name, many_name)
+
+        @classmethod
+        def has_many(cls, other, one_name=None, many_name=None):
+            return other._has_one(cls, one_name, many_name)
+        
+        @classmethod
+        def _has_one(cls, other, one_name=None, many_name=None):
+            if not issubclass(other, Record) or cls is other or \
+                cls in other._has_many: return cls
+
+            tn = many_name or (cls.__name__.lower() + "s")
+            on = one_name or other.__name__.lower()
+
+            # has_one
+            setattr(cls, on, property(
+                renpy.partial(other._get_one, name=on),
+                renpy.partial(other._set_one, name=on)
+            ))
+
+            # has_many
+            other._has_many[cls] = on
+            setattr(other, tn, property(
+                renpy.partial(cls._get_many, name=on)
+            ))
+
+            return cls
+
+        @classmethod
+        def _get_one(cls, self, name):
+            return helper.ensureattr(self, "_{}".format(name))
+
+        @classmethod
+        def _set_one(cls, self, value, name):
+            setattr(self, "_{}".format(name), value)
+
+        @classmethod
+        def _get_many(cls, self, name):
+            return cls.get_all(
+                lambda e: getattr(e, name) and getattr(e, name).id == self.id)
+
+    class Test(Record): pass
+
+    # Record.has_one(Test)
+    # Test.has_many(Record)
+    # r = Record().create()
+    # t = Test().create()
+    # r.test = t
