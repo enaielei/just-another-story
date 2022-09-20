@@ -1,5 +1,7 @@
 init python hide:
     modules = (
+        "scripts/utils/helper",
+        "scripts/utils/record",
         "scripts/utils/tracker",
         "scripts/utils/hint",
         "scripts/utils/episode"
