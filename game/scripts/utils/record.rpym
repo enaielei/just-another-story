@@ -14,7 +14,7 @@ init python:
         @property
         def _all(self):
             name = "_{}_all".format(self.__name__.lower())
-            return helper.ensureattr(store, name, [])
+            return ensureattr(store, name, [])
 
         @property
         def all(self): return tuple(self._all)
@@ -73,7 +73,7 @@ init python:
 
         def delete(self):
             cls = self.__class__
-            i = helper.index(lambda e: e.id == self.id, cls._all)
+            i = index(lambda e: e.id == self.id, cls._all)
             if i != -1:
                 e = cls._all[i]
                 
@@ -102,7 +102,7 @@ init python:
         @classmethod
         def get(cls, condition=None):
             if not callable(condition): condition = lambda e: True
-            return helper.find(condition, cls._all)
+            return find(condition, cls._all)
 
         @classmethod
         def get_all(cls, condition=None):
@@ -158,7 +158,7 @@ init python:
         @classmethod
         def _get_one(cls, self, name):
             name = "_{}_id".format(name)
-            id = helper.ensureattr(self, name, -1)
+            id = ensureattr(self, name, -1)
             return cls.get(lambda e: e.id == id)
 
         @classmethod
