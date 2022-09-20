@@ -1,4 +1,4 @@
-init python:
+init python in utils:
     import store, sys, io, math
     from pprint import pprint
 
@@ -29,6 +29,10 @@ init python:
     def ensureattr(obj, name, default=None):
         if not hasattr(obj, name): setattr(obj, name, default)
         return getattr(obj, name)
+
+    def ensurekey(dct, name, default=None):
+        if name not in dct: dct[name] = default
+        return dct[name]
 
     def screen_get(screen, name, value, default=None, layer=None):
         if isinstance(screen, basestring):

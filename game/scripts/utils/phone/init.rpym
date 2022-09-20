@@ -1,0 +1,10 @@
+init python in utils.phone:
+    from store import renpy
+
+    modules = (
+        "scripts/utils/phone/user",
+        "scripts/utils/phone/phone",
+    )
+    
+    for mod in modules:
+        renpy.load_module(mod)

@@ -1,21 +1,12 @@
-init python:
-    class Episode():
+init python in utils:
+    from store import renpy, Function
+    
+    renpy.load_module("scripts/utils/record")
+
+    class Episode(Record):
         PREFIX = "ep"
         BEGINNING = "beginning"
         ENDING = "ending"
-
-        all = []
-
-        @property
-        def number(self):
-            try:
-                return self.__class__.all.index(self) + 1
-            except:
-                return 0
-
-        @property
-        def id(self):
-            return "{}{}".format(self.__class__.PREFIX, self.number)
 
         @property
         def beginning(self):
@@ -33,7 +24,7 @@ init python:
                 renpy.seen_label(self.ending)
 
         def __init__(self, title, description="", displayable=None):
-            self.__class__.all.append(self)
+            Record.__init__(self)
 
             self.title = title
             self.description = description

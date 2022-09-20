@@ -1,4 +1,6 @@
-init python:
+init python in utils:
+    from store import renpy, config, Function
+
     class Hint():
         LAYER = "hint"
         SCREEN = "hint"

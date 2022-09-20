@@ -1,10 +1,14 @@
-init python hide:
+init python in utils:
+    from store import renpy
+
     modules = (
         "scripts/utils/helper",
         "scripts/utils/record",
         "scripts/utils/tracker",
         "scripts/utils/hint",
-        "scripts/utils/episode"
+        "scripts/utils/episode",
+        "scripts/utils/persona",
+        # "scripts/utils/phone/init",
     )
     
     for mod in modules:

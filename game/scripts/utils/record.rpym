@@ -1,33 +1,32 @@
-init python:
+init python in utils:
+    from store import renpy
     from datetime import datetime
+
+    renpy.load_module("scripts/utils/helper")
 
     class RecordMeta(type):
         def __new__(self, name, bases, attrs):
             attrs["_one"] = {}
             attrs["_many"] = {}
-            return type.__new__(self, name, bases, attrs)
+            cls = type.__new__(self, name, bases, attrs)
+            return cls
 
         def __getitem__(self, index):
-            try: return self._all[index]
+            try: return self._all()[index]
             except: pass
 
         @property
-        def _all(self):
-            name = "_{}_all".format(self.__name__.lower())
-            return ensureattr(store, name, [])
-
-        @property
-        def all(self): return tuple(self._all)
+        def all(self): return tuple(self._all())
 
         @property
         def max_id(self):
-            m = max(self._all, default=None, key=lambda e: e.id)
+            m = max(self._all(), default=None, key=lambda e: e.id)
             id = -1 if not m else m.id
             return id
 
         @property
         def min_id(self):
-            m = min(self._all, default=None, key=lambda e: e.id)
+            m = min(self._all(), default=None, key=lambda e: e.id)
             id = -1 if not m else m.id
             return id
 
@@ -61,7 +60,7 @@ init python:
 
             cls = self.__class__
             id = cls.max_id + 1
-            cls._all.append(self)
+            cls._all().append(self)
             self._id = id
             self._datetime_created = datetime.now()
             return self
@@ -73,9 +72,9 @@ init python:
 
         def delete(self):
             cls = self.__class__
-            i = index(lambda e: e.id == self.id, cls._all)
+            i = index(lambda e: e.id == self.id, cls._all())
             if i != -1:
-                e = cls._all[i]
+                e = cls._all()[i]
                 
                 # Remove any references
                 for c, n in cls._one.items():
@@ -83,7 +82,7 @@ init python:
 
                 e._id = -1
                 e._datetime_created = None
-                cls._all.pop(i)
+                cls._all().pop(i)
 
             return self
 
@@ -102,12 +101,12 @@ init python:
         @classmethod
         def get(cls, condition=None):
             if not callable(condition): condition = lambda e: True
-            return find(condition, cls._all)
+            return find(condition, cls._all())
 
         @classmethod
         def get_all(cls, condition=None):
             if not callable(condition): condition = lambda e: True
-            return tuple(filter(condition, cls._all))
+            return tuple(filter(condition, cls._all()))
 
         @classmethod
         def has_one(cls, other, one_name=None):
@@ -120,7 +119,7 @@ init python:
         @classmethod
         def _operate_by(cls, operation, condition=None):
             if not callable(condition): condition = lambda e: True
-            for e in cls._all:
+            for e in cls._all():
                 if condition(e): operation(e)
 
             return cls
@@ -169,3 +168,8 @@ init python:
         def _get_many(cls, self, name):
             return cls.get_all(
                 lambda e: getattr(e, name, None) and getattr(e, name).id == self.id)
+
+        @classmethod
+        def _all(cls):
+            return ensureattr(renpy.eval(cls.__module__), "_{}_all".format(
+                cls.__name__.lower()), [])

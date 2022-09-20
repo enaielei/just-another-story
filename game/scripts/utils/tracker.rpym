@@ -1,4 +1,6 @@
-init python:
+init python in utils:
+    from store import renpy, Transform
+
     def _tracker(tr, st, at, interval=0):
         ssize = (config.screen_width, config.screen_height)
         csize = tr.child_size
@@ -30,7 +32,13 @@ init python:
         return interval
 
     def Tracker(child=None, interval=0, *args, **kwargs):
-        return Transform(child, renpy.partial(_tracker, interval=interval), *args, **kwargs)
+        return Transform(child, renpy.partial(_tracker, interval=interval),
+            *args, **kwargs)
 
-transform tracker(interval=0):
-    function renpy.partial(_tracker, interval=interval)
+init:
+    transform tracker(interval=0):
+        function renpy.partial(_tracker, interval=interval)
+    
+    python:
+        utils.tracker = tracker
+        del tracker
