@@ -1,5 +1,5 @@
 init python in utils:
-    from store import renpy, Function
+    from store import renpy, Function, Start
     
     renpy.load_module("scripts/utils/record")
 
@@ -8,14 +8,22 @@ init python in utils:
         BEGINNING = "beginning"
         ENDING = "ending"
 
+        current = None
+
+        @property
+        def tag(self): return "{}{}".format(self.__class__.PREFIX, self.number)
+
+        @property
+        def number(self): return self.id + 1
+
         @property
         def beginning(self):
-            l = "{}_{}".format(self.id, self.__class__.BEGINNING)
+            l = "{}_{}".format(self.tag, self.__class__.BEGINNING)
             return l if renpy.has_label(l) else ""
 
         @property
         def ending(self):
-            l = "{}_{}".format(self.id, self.__class__.ENDING)
+            l = "{}_{}".format(self.tag, self.__class__.ENDING)
             return l if renpy.has_label(l) else ""
 
         @property
@@ -35,3 +43,12 @@ init python in utils:
 
         def Play(self):
             return Function(self.play)
+
+        @classmethod
+        def initialize(cls):
+            ocb = config.label_callback
+            def cb(name, flag):
+                if ocb: ocb(name, flag)
+                tag, _, _ = name.partition("_")
+                cls.current = cls.get(lambda e: e.tag == tag)
+            config.label_callback = cb

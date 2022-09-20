@@ -1,5 +1,8 @@
+init python:
+    import math
+
 init python in utils:
-    import store, sys, io, math
+    import store, sys, io
     from pprint import pprint
 
     _print = print

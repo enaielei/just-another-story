@@ -37,7 +37,7 @@ init python in utils:
 
 init:
     transform tracker(interval=0):
-        function renpy.partial(_tracker, interval=interval)
+        function renpy.partial(utils._tracker, interval=interval)
     
     python:
         utils.tracker = tracker
