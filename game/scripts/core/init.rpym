@@ -1,13 +1,18 @@
 init python:
+    from pprint import pprint
+
     load_module(
         "scripts/core/gui",
         "scripts/core/config",
         "scripts/core/build",
         
-        "scripts/core/character-profile",
+        "scripts/core/persona",
+        "scripts/core/person",
+
         "scripts/core/styles",
         "scripts/core/screens",
         "scripts/core/labels",
     )
 
     Hint.initialize()
+    Person.initialize()

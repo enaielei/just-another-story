@@ -3,8 +3,8 @@ label ep1_beginning:
 
 label ep1_scene1:
     # mc and daughter sleeping together
-    mc "A lot happened recently." (kwargs=dict(abc=123))
-    "A lot happened recently."
+    mc "A lot happened recently."
+    amr "A lot happened recently."
 
 label ep1_scene2:
     # mc taking a bath

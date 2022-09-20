@@ -11,9 +11,9 @@ screen main_menu():
         textbutton "Quit":
             action Quit()
 
-screen say(who, what, *args, **kwargs):
+screen say(who, what, person):
     python:
-        action = NullAction()
+        action = Show("profiles", None, Person.all, person)
 
     window:
         id "window"
@@ -23,24 +23,102 @@ screen say(who, what, *args, **kwargs):
         vbox:
             spacing 20
             align (0.5, 1.0)
-            xsize 1.0
+            xfill True
 
             button:
                 id "namebox"
-                action action
-                hovered Hint.Set(who, Solid("#f00", xysize=(200, 200)))
-                unhovered Hint.Clear()
+                if person:
+                    action action
+                    hovered Hint.Set(person.full_name, Null(), yoffset=-40)
+                    unhovered Hint.Clear()
+                    xalign 0.5
 
                 text (who if who is not None else ""):
                     id "who"
-                    xalign 0.5
-                    xsize 1.0
                     bold True
+                    hover_color "#0f0"
             
             text what:
                 id "what"
                 xalign 0.5
-                xsize 1.0
+                xfill True
+
+screen profiles(persons, person=None):
+    default selected = person
+
+    python:
+        screen = renpy.current_screen()
+        count = len(persons)
+        cols = 1
+        rows = math.ceil(count / float(cols))
+
+    modal True
+
+    vbox:
+        spacing 10
+        
+        vpgrid:
+            cols cols
+            rows rows
+            spacing 10
+            scrollbars "vertical"
+            mousewheel True
+
+            for i in range(cols * rows):
+                fixed:
+                    xysize (300, 120)
+
+                    if i < count:
+                        python:
+                            p = persons[i]
+
+                        button:
+                            action ToggleScreenVariable("selected", p, None)
+                            xfill True
+                            yfill True
+
+                            hbox:
+                                spacing 10
+
+                                add p.image
+                                vbox:
+                                    text p.full_name
+                                    text p.name:
+                                        size style.text.size * 0.85
+
+        textbutton "Close" action Hide("profiles")
+
+
+    # vbox:
+    #     spacing 10
+
+    #     for p in persons:
+    #         textbutton p.full_name:
+    #             action ToggleScreenVariable("selected", p, None)
+    #             # selected p == person
+
+    #     null height 10
+    #     textbutton "Close" action Hide("profiles")
+
+    if selected is not None:
+        use profile(selected, screen)
+
+screen profile(person, profiles=None):
+    modal True
+
+    vbox:
+        xalign 0.30
+        spacing 10
+        
+        hbox:
+            spacing 20
+            text "Given Name: [person.given_name]"
+            if person.middle_name:
+                text "Middle Name: [person.middle_name]"
+            text "Family Name: [person.family_name]"
+
+        null height 10
+        textbutton "Close" action [ScreenSet(profiles, "selected", None), Hide("profile")]
 
 screen hint(hint=None, **kwargs):
     $ hint = Hint.get(hint)

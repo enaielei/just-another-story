@@ -6,7 +6,21 @@ style text is default
 
 style button is window:
     background "#fff3"
+    selected_background "#fff5"
     hover_background "#fff5"
 
 style button_text is text:
+    selected_color "#0f0"
     hover_color "#0f0"
+
+style bar is default:
+    base_bar "#fff2"
+    thumb "#fff4"
+
+style scrollbar is bar:
+    xsize 1.0
+    ysize 10
+
+style vscrollbar is scrollbar:
+    xsize 10
+    ysize 1.0
