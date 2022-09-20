@@ -1,5 +1,24 @@
-init python in helper:
-    import store, sys
+init python:
+    import store, sys, io, math
+    from pprint import pprint
+
+    _print = print
+
+    def print(*args, **kwargs):
+        stream = io.StringIO()
+        sep = kwargs.pop("sep", "\n")
+        strs = []
+        for a in args:
+            stream.truncate(0)
+            stream.seek(0)
+            pprint(a, stream, **kwargs)
+            strs.append(stream.getvalue()[:-1])
+
+        _print(*strs, sep=sep)
+
+    def unpack(dct, *keys, **kwargs):
+        if "default" in kwargs: default = kwargs.pop("default")
+        return (dct.get(k, default) for k in keys)
 
     def find(condition, iterable, default=None):
         return next(filter(condition, iterable), default)
@@ -11,22 +30,21 @@ init python in helper:
         if not hasattr(obj, name): setattr(obj, name, default)
         return getattr(obj, name)
 
-    def get_variable(screen, name, value, default=None, layer=None):
+    def screen_get(screen, name, value, default=None, layer=None):
         if isinstance(screen, basestring):
             screen = renpy.get_screen(screen, layer)
 
         return screen.scope[name] if screen else default
 
-    def set_variable(screen, name, value, layer=None):
+    def screen_set(screen, name, value, layer=None):
         if isinstance(screen, basestring):
             screen = renpy.get_screen(screen, layer)
 
         if screen: screen.scope[name] = value
-        if screen: sys._getframe(1).f_locals[name] = value
-        renpy.restart_interaction()
+        # if screen: sys._getframe(1).f_locals[name] = value
 
-    def GetVariable(screen, name, value, default=None, layer=None):
-        return store.Function(get_variable, screen, name, value, default, layer)
+    def ScreenGet(screen, name, value, default=None, layer=None):
+        return store.Function(screen_get, screen, name, value, default, layer)
 
-    def SetVariable(screen, name, value, layer=None):
-        return store.Function(set_variable, screen, name, value, layer)
+    def ScreenSet(screen, name, value, layer=None):
+        return store.Function(screen_set, screen, name, value, layer)
