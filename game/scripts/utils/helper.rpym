@@ -2,7 +2,8 @@ init python:
     import math
 
 init python in utils:
-    import store, sys, io
+    import store, os, sys, io
+    from store import renpy, Movie
     from pprint import pprint
 
     _print = print
@@ -18,6 +19,82 @@ init python in utils:
             strs.append(stream.getvalue()[:-1])
 
         _print(*strs, sep=sep)
+
+    def list_files(directory, common=False):
+        directory = directory.rstrip('/') + '/'
+        return tuple(fp for fp in renpy.list_files(common) if fp.startswith(directory))
+
+    def _do_files(action, filepaths, callback=None, extensions=[]):
+        extensions = [ext.lower() for ext in extensions]
+        for fn in filepaths:
+            di, basename = os.path.split(fn)
+            base, ext = os.path.splitext(basename)
+
+            if not ext.lower() in extensions:
+                continue
+
+            name = fn.removesuffix(ext).replace("/", " ").replace(".", " ").lower()
+            if callable(callback): name = callback(name)
+
+            action(fn, di, basename, base, ext, name)
+
+    def _define_images(filepath, dir, basename, base, extension, name):
+        renpy.image(name, filepath)
+        print(dict(define_image=dict(name=name, filepath=filepath)))
+
+    def _define_videos(filepath, dir, basename, base, extension, name):
+        kwargs = {}
+        exp = "{}/{}.json".format(dir, basename)
+        imp = "{}/{}.json".format(dir, base)
+
+        if renpy.loadable(exp): pt = exp
+        elif renpy.loadable(imp): pt = imp
+        else: pt = None
+
+        if pt is not None:
+            with renpy.file(pt) as file:
+                import json
+                kwargs = dict(json.load(file))
+
+            kwargs = {k: renpy.eval(v) for k, v in kwargs.items()}
+
+        renpy.image(name, Movie(play=fn, **kwargs))
+        print(dict(define_video=dict(name=name, filepath=filepath)))
+
+    def _define_animations(filepath, dir, basename, base, extension, name, extensions, frames, props):
+        di, basename = os.path.split(dir)
+        base, ext = os.path.splitext(basename)
+
+        if not ext.lower() in extensions:
+            return
+
+        aname = dir.removesuffix(ext).replace("/", " ").lower()
+        if aname not in frames: frames[aname] = []
+        frames[aname].append(filepath)
+        
+        if aname not in props:
+            props[aname] = {}
+            f = "{}/.json".format(dir)
+            if not renpy.loadable(f): return
+            with renpy.file(f) as file:
+                import json
+                kwargs = dict(json.load(file))
+                kwargs = {k: renpy.eval(v) for k, v in kwargs.items()}
+                props[aname].update(kwargs)
+
+    def define_images(filepaths, callback=None, extensions=[".jpg", ".jpeg", ".png", ".webp"]):
+        _do_files(_define_images, filepaths, callback, extensions)
+
+    def define_videos(filepaths, callback=None, extensions=[".avi", ".webm", ".mkv", ".ogg"]):
+        _do_files(_define_videos, filepaths, callback, extensions)
+
+    def define_animations(filepaths, callback=None, extensions=[".animation", ".anim"], frame_extensions=[".jpg", ".jpeg", ".png", ".webp"]):
+        frames, props = {}, {}
+        _do_files(renpy.partial(_define_animations, extensions=extensions, frames=frames, props=props), filepaths, callback, frame_extensions)
+        
+        for name, frms in frames.items():
+            renpy.image(name, Animation(frms, **props[name]))
+            print(dict(define_animation=dict(name=name, frames=frms, props=props[name])))
 
     def unpack(dct, *keys, **kwargs):
         if "default" in kwargs: default = kwargs.pop("default")
@@ -55,3 +132,12 @@ init python in utils:
 
     def ScreenSet(screen, name, value, layer=None):
         return store.Function(screen_set, screen, name, value, layer)
+
+    def _animation(st, at, frames=[], interval=0.03):
+        frame_count = len(frames)
+        frame = int((st // interval) % frame_count)
+
+        return frames[frame], interval
+
+    def Animation(frames, interval=0.03):
+        return store.DynamicDisplayable(_animation, frames=frames, interval=interval)
