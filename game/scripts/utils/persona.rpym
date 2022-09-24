@@ -1,5 +1,5 @@
 init python in utils:
-    from store import config, Null
+    import store
 
     renpy.load_module("scripts/utils/record")
 
@@ -17,7 +17,7 @@ init python in utils:
         def __init__(self, name=None, image=None, character=None):
             Record.__init__(self)
             self.name = name or ""
-            self.image = image or Null()
+            self.image = image or store.Null()
             self.character = character
 
         def __str__(self):
@@ -28,6 +28,8 @@ init python in utils:
 
         @classmethod
         def initialize(cls, name=None):
+            config = store.config
+
             ocb = config.say_arguments_callback
             name = name or cls.__name__.lower()
             def cb(who, interact=True, *args, **kwargs):
