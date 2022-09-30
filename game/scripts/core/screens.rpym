@@ -1,20 +1,61 @@
+screen menu_button(text, **properties):
+    textbutton text.upper():
+        text_size style.text.size * 1.5
+        text_xalign 0.5
+        text_bold True
+        yalign 0.5
+        properties properties
+
 screen main_menu():
-    tag menu
-    
-    vbox:
-        for ep in Episode.all:
-            textbutton "Episode [ep.number]: [ep.title]":
-                action ep.Play()
+    hbox:
+        spacing 20
+        align (0.5, 0.9)
+        
+        use menu_button(_("Settings"),
+            size_group="main_menu_button", action=Start("ep1_beginning")
+        )
+        use menu_button(_("Help"),
+            size_group="main_menu_button", action=Start("ep1_beginning")
+        )
+        use menu_button(_("Play"),
+            size_group="main_menu_button", action=Start("ep1_beginning"),
+            text_size=style.text.size * 2
+        )
+        use menu_button(_("About"),
+            size_group="main_menu_button", action=Start("ep1_beginning")
+        )
+        use menu_button(_("Quit"),
+            size_group="main_menu_button", action=Quit(True)
+        )
 
-        null height 20
+screen confirm(message, yes_action, no_action):
+    modal True
 
-        textbutton "Quit":
-            action Quit()
+    zorder 200
 
-screen say(who, what, person):
-    python:
-        action = Show("profiles", None, Person.all, person)
+    frame:
+        align (0.5, 0.5)
+        padding (25, 25)
+        background "#fff2"
 
+        vbox:
+            xalign 0.5
+            yalign 0.5
+            spacing 45
+
+            label _(message):
+                xalign 0.5
+
+            hbox:
+                xalign 1.0
+                spacing 20
+
+                textbutton _("Yes") action yes_action
+                textbutton _("No") action no_action
+
+    key "game_menu" action no_action
+
+screen say(who, what):
     window:
         id "window"
         align (0.5, 0.95)
@@ -25,116 +66,15 @@ screen say(who, what, person):
             align (0.5, 1.0)
             xfill True
 
-            button:
+            window:
                 id "namebox"
-                if person:
-                    action action
-                    hovered Hint.Set(person.full_name, Null(), yoffset=-40)
-                    unhovered Hint.Clear()
-                    xalign 0.5
+                xalign 0.5
 
                 text (who if who is not None else ""):
                     id "who"
                     bold True
-                    hover_color "#0f0"
             
             text what:
                 id "what"
                 xalign 0.5
                 xfill True
-
-screen profiles(persons, person=None):
-    default selected = person
-
-    python:
-        screen = renpy.current_screen()
-        count = len(persons)
-        cols = 1
-        rows = math.ceil(count / float(cols))
-
-    modal True
-
-    vbox:
-        spacing 10
-        
-        vpgrid:
-            cols cols
-            rows rows
-            spacing 10
-            scrollbars "vertical"
-            mousewheel True
-
-            for i in range(cols * rows):
-                fixed:
-                    xysize (300, 120)
-
-                    if i < count:
-                        python:
-                            p = persons[i]
-
-                        button:
-                            action ToggleScreenVariable("selected", p, None)
-                            xfill True
-                            yfill True
-
-                            hbox:
-                                spacing 10
-
-                                add p.image
-                                vbox:
-                                    text p.full_name
-                                    text p.name:
-                                        size style.text.size * 0.85
-
-        textbutton "Close" action Hide("profiles")
-
-
-    # vbox:
-    #     spacing 10
-
-    #     for p in persons:
-    #         textbutton p.full_name:
-    #             action ToggleScreenVariable("selected", p, None)
-    #             # selected p == person
-
-    #     null height 10
-    #     textbutton "Close" action Hide("profiles")
-
-    if selected is not None:
-        use profile(selected, screen)
-
-screen profile(person, profiles=None):
-    modal True
-
-    vbox:
-        xalign 0.30
-        spacing 10
-        
-        hbox:
-            spacing 20
-            text "Given Name: [person.given_name]"
-            if person.middle_name:
-                text "Middle Name: [person.middle_name]"
-            text "Family Name: [person.family_name]"
-
-        null height 10
-        textbutton "Close" action [ScreenSet(profiles, "selected", None), Hide("profile")]
-
-screen hint(hint=None, **kwargs):
-    $ hint = Hint.get(hint)
-
-    layer "hint"
-
-    if hint and not hint.empty and hint.active:
-        vbox:
-            xoffset 20
-            yoffset 20
-            properties hint.kwargs
-
-            if hint.text:
-                text hint.text
-
-            if hint.displayable:
-                add hint.displayable
-
-            at tracker

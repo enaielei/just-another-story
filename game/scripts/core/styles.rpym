@@ -2,9 +2,15 @@ style default
 
 style window is default
 
-style text is default
+style text is default:
+    font "fonts/DMSans-Regular.ttf"
+
+style label_text is text
+
+style label is window
 
 style button is window:
+    padding (15, 7)
     background "#fff3"
     selected_background "#fff5"
     hover_background "#fff5"
@@ -24,3 +30,7 @@ style scrollbar is bar:
 style vscrollbar is scrollbar:
     xsize 10
     ysize 1.0
+
+style say_label is text
+
+style say_dialogue is text

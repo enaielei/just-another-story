@@ -1,5 +1,5 @@
 label ep1_beginning:
-    pass
+    jump ep1_scene1
 
 label ep1_scene1:
     # mc and daughter sleeping together

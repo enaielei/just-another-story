@@ -1,7 +1,0 @@
-init python:
-    load_module(
-        "scripts/ep1/variables",
-        "scripts/ep1/labels",
-    )
-
-    Episode("A New Beginning")

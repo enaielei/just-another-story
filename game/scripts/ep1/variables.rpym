@@ -1,15 +1,6 @@
-define character.mc = Character()
-default mc = Person.create_by(
-    "Reeves", "Michael", "Jester",
-    name="Michael",
-    image=Solid("#00f", xysize=(100, 100)),
-    character=character.mc
-)
+# Reeves, Michael Jester
+default mc = "Michael"
+define character.mc = Character("mc", dynamic=True)
 
-define character.amr = Character()
-default amr = Person.create_by(
-    "Reeves", "Anastasia", "Moonfort",
-    name="Anastasia",
-    image=Solid("#f00", xysize=(100, 100)),
-    character=character.amr
-)
+# Reeves, Anastasia Moonfort
+define character.amr = Character("Anastasia")
